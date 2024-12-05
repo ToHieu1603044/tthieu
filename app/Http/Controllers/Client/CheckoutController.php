@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\Product;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -29,17 +30,16 @@ class CheckoutController extends Controller
 
     public function store(Request $request)
     {
-
-
         if (!Auth::check()) {
             return redirect()->route('login');
         }
-
+    
         $user = Auth::user();
-
+    
         DB::beginTransaction();
-
+    
         try {
+        
             $order = Order::create([
                 'user_id' => $user->id,
                 'total_amount' => $request->total_amount,
@@ -53,34 +53,56 @@ class CheckoutController extends Controller
                 'payment_method' => $request->payment_method,
                 'online_payment_method' => $request->online_payment_method ?? null,
             ]);
-
-            $cartItems = json_decode($request->cart_items, true);
-            foreach ($cartItems as $item) {
-                OrderDetail::create([
+    
+            $quantily = 0; // So luong = 0
+            $cartItems = json_decode($request->cart_items, true); // lấy session giỏ hàng thông qua thẻ hidden
+    
+            foreach ($cartItems as $item) {      
+                $stok = DB::table('product_color_size')                        //Lấy ra số lượng trong kho của sản phẩm
+                    ->where('product_id', $item['id'])
+                    ->value('stock');      
+                $quantily += $item['quantily'];                                      // cộng với số lượng sản phẩm lấy được qua giỏ hàng
+    
+               
+                $orderDetail = OrderDetail::create([
                     'order_id' => $order->id,
                     'product_id' => $item['id'],
                     'quantity' => $item['quantily'],
                     'price' => $item['price_sell'],
                 ]);
+    
+                //Cập nhật lại số lượng trong kho
+                $newStock = $stok - $item['quantily'];      
+    
+               
+                if ($newStock < 0) {
+                    throw new \Exception("Số lượng hàng trong kho đã hết" . $item['name']);
+                }
+    
+                DB::table('product_color_size')
+                    ->where('product_id', $item['id'])
+                    ->update(['stock' => $newStock]);
             }
-
+    
+          
             if ($request->payment_method == 'online' && $request->payment_method_option == 'momo') {
-
-                $momoResponse = $this->processPayment($order->id,$order->total_amount);
+                $momoResponse = $this->processPayment($order->id, $order->total_amount);
                 DB::commit();
-
                 return redirect()->away($momoResponse['payUrl']);
             }
+                     
             DB::commit();
+             
             session()->forget('cart');
+    
             return redirect()->route('checkoutstatus')->with('success', 'Đặt hàng thành công');
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Order creation failed: ' . $e->getMessage());
-
             return redirect()->route('checkoutstatus')->with('error', 'Đặt hàng thất bại. Vui lòng thử lại.');
         }
     }
+    
 
     public function processPayment($orderId,$total_amount)
     {
