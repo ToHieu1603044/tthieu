@@ -89,9 +89,10 @@
                                         </a>
                                     @endif
                                     @if ($actions['viewDetail'])
-                                        <button id="btn-table-view-detail__js" class="btn btn-info">
-                                            <i class="fas fa-history"></i>
-                                        </button>
+                                    <a href="{{ isset($routes['detail']) ? route($routes['detail'], $item->id) : '#' }}"
+                                        id="edit-customer" class="btn btn-info next-link__js">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
                                     @endif
                                     @if ($actions['delete'])
                                         <form style="display: inline;"

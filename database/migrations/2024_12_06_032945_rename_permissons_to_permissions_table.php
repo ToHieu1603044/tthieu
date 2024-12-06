@@ -13,7 +13,7 @@ class RenameTablePermissionsToPermissons extends Migration
      */
     public function up()
     {
-        Schema::rename('permissions', 'permissons'); // Đổi tên bảng
+        Schema::rename('permissons', 'permissions'); // Đổi tên bảng
     }
 
     /**

@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\Admin\AuthenController;
 use App\Http\Controllers\Admin\CategoryController;
-
 use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PermissionController;
@@ -16,12 +15,7 @@ use App\Livewire\CategorySubcategory;
 use Illuminate\Support\Facades\Route;
 
 
-// Route::middleware('auth')->group(function () {
-//     Route::get('checkout', [CheckoutController::class, 'index'])->name('checkout.index');
-//     Route::post('checkout', [CheckoutController::class, 'store'])->name('checkout.store');
-//     Route::get('checkout/{orderId}/payment', [CheckoutController::class, 'payment'])->name('checkout.payment');
-//     Route::post('checkout/{orderId}/process-payment', [CheckoutController::class, 'processPayment'])->name('checkout.process_payment');
-// });
+
 // Route để trả về trang thành công sau khi thanh toán
 Route::get('checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
 
@@ -62,10 +56,10 @@ Route::middleware(['auth','role:admin|subadmin'])->prefix('admin')->group(functi
 
     Route::resource('categories', CategoryController::class);
 
-    Route::resource('order',OrderController::class);
+    Route::resource('orders',OrderController::class);
+   
 
 });
-
 
 Auth::routes();
 
