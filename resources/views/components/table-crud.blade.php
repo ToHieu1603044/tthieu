@@ -12,7 +12,7 @@
                         </a>
                     @endif
                     @if ($actions['createExcel'])
-                        <button class="btn btn-success ml-1">Excel</button>
+                        <button class="btn btn-success ml-1"><i class="fa-regular fa-file-excel"></i> Excel</button>
                     @endif
                 </div>
                 <div class="col-6 text-right">

@@ -25,6 +25,7 @@
                         :routes="$table['routes']" />
 
                     </div>
+                    {{$table['list']->links()}}
                 </div>
             </div>
         </div>

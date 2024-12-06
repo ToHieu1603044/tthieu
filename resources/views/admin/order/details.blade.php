@@ -68,7 +68,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <article class="card shadow-sm">
-            <header class="card-header bg-primary text-white"> My Orders / Tracking </header>
+            <header class="card-header bg-primary text-white"> Đơn hàng / Chi tiết </header>
             <div class="card-body">
                 <h6><strong>Order ID:</strong> SPX{{ $order->order_id }}</h6>
 

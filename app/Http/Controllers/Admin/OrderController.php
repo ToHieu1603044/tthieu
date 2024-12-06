@@ -38,9 +38,9 @@ class OrderController extends Controller
             'actions' => [
                 'text' => 'Thao Tác',
                 'create' => false,
-                'createExcel' => false,
-                'edit' => true,
-                'deleteAll' => true,
+                'createExcel' => true,
+                'edit' => false,
+                'deleteAll' => false,
                 'delete' => true,
                 'viewDetail' => true,
                 'editPermission' => false
@@ -115,6 +115,7 @@ class OrderController extends Controller
     
         return response()->json(['success' => false, 'message' => 'Cập nhật thất bại']);
     }
+
     
 
 }

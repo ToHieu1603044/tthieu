@@ -2,6 +2,7 @@
 
 @section('content')
     <div>
+        
         <livewire:category-show>
     </div>
 @endsection

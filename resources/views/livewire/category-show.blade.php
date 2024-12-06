@@ -1,6 +1,7 @@
 <div>
     @include('livewire.modal')
     <div class="container">
+        <header class="card-header bg-primary text-white">Danh mục</header>
         <div class="row">
             <div class="col-md-12">
                 @if (session()->has('message'))

@@ -2,6 +2,7 @@
 @section('content')
     {{-- @dd('admin.categorybyparent') --}}
     <section section class="content">
+        <header class="card-header bg-primary text-white">Sản phẩm / Sửa sản phẩm</header>
         <div class="container-fluid">
             <div class="row">
             </div>
