@@ -91,7 +91,7 @@
                                     @if ($actions['viewDetail'])
                                     <a href="{{ isset($routes['detail']) ? route($routes['detail'], $item->id) : '#' }}"
                                         id="edit-customer" class="btn btn-info next-link__js">
-                                        <i class="fas fa-edit"></i>
+                                        <i class="fa-solid fa-circle-info"></i>
                                     </a>
                                     @endif
                                     @if ($actions['delete'])

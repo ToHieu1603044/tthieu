@@ -96,6 +96,27 @@ class OrderController extends Controller
         return view('admin.order.details', compact('order', 'data'));
     }
 
+    public function updateNote(Request $request, $id)
+    {
+
+        $validated = $request->validate([
+            'note' => 'required|integer|between:0,4'
+        ]);
+       
+        $order = Order::find($id); 
+
+        if ($order) {
+            $order->note = $request->note;
+
+            $order->save();
+    
+            return response()->json(['success' => true, 'message' => 'Cập nhật thành công']);
+        }
+    
+        return response()->json(['success' => false, 'message' => 'Cập nhật thất bại']);
+    }
+    
+
 }
 
 

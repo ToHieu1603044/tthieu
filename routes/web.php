@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Client\CheckoutController;
+use App\Http\Controllers\Client\ListOrderController;
 use App\Http\Controllers\Client\PageController;
 use App\Livewire\Category;
 use App\Livewire\CategorySubcategory;
@@ -31,12 +32,16 @@ Route::get('/',[PageController::class,'home']);
 Route::get('product/{product}/detail', [PageController::class, 'productDetail'])->name('product.detail');
 Route::get('categoryslug/{slug}', [PageController::class, 'categorybyslug'])->name('categoryslug');
 
+
+
+
 Route::get('get-pro-by-cate/{slug}', [PageController::class, 'getProductbyCategory'])->name('get-pro-by-cate');
 
 Route::get('addtocart', [PageController::class, 'addToCart'])->name('addtocart');
 Route::get('cart/{product}', [PageController::class, 'storeCart'])->name('cart');
 Route::get('remove/{id}', [PageController::class, 'removeCart'])->name('removeCart');
 
+Route::get('orders-history',[ListOrderController::class,'index'])->name('user.order');
 
 Route::middleware(['auth','role:admin|subadmin'])->prefix('admin')->group(function () {
 
@@ -55,7 +60,7 @@ Route::middleware(['auth','role:admin|subadmin'])->prefix('admin')->group(functi
     Route::get('get-categories-by-parent', [ProductController::class, 'getCategoryByParent'])->name('admin.category_by_parent');
 
     Route::resource('categories', CategoryController::class);
-
+    Route::post('/order/{id}/update-note/', [OrderController::class, 'updateNote'])->name('order.updateNote');
     Route::resource('orders',OrderController::class);
    
 
