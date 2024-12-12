@@ -17,6 +17,8 @@ return [
         'guard' => 'web',
         'passwords' => 'users',
     ],
+    
+    
 
     /*
     |--------------------------------------------------------------------------
@@ -40,6 +42,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+       'api' => [
+        'driver' => 'jwt',  // Sử dụng JWT cho API (token-based)
+        'provider' => 'users',
+        'hash' => false,
+    ],
     ],
 
     /*

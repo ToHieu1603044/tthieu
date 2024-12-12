@@ -53,8 +53,7 @@ class PageController extends Controller
     }
     public function storeCart(Product $product)
     {       
-
-      
+   
         try {
             $product = $product->load('category', 'colors', 'sizes');
             $stock = DB::table('product_color_size')

@@ -14,7 +14,7 @@ class CheckoutController extends Controller
 {
     public function index()
     {
-        $cartItems = session('cart', []);
+        $cartItems = session('cart', default: []);
         $totalAmount = 0;
 
         foreach ($cartItems as $item) {
@@ -33,13 +33,13 @@ class CheckoutController extends Controller
         if (!Auth::check()) {
             return redirect()->route('login');
         }
-    
+
         $user = Auth::user();
-    
+
         DB::beginTransaction();
-    
+
         try {
-        
+
             $order = Order::create([
                 'user_id' => $user->id,
                 'total_amount' => $request->total_amount,
@@ -53,48 +53,46 @@ class CheckoutController extends Controller
                 'payment_method' => $request->payment_method,
                 'online_payment_method' => $request->online_payment_method ?? null,
             ]);
-    
+
             $quantily = 0; // So luong = 0
-            $cartItems = json_decode($request->cart_items, true); // lấy session giỏ hàng thông qua thẻ hidden
-    
-            foreach ($cartItems as $item) {      
+            $cartItems = json_decode($request->cart_items, true); // lấy session giỏ hàng qua thẻ hidden
+
+            foreach ($cartItems as $item) {
                 $stok = DB::table('product_color_size')                        //Lấy ra số lượng trong kho của sản phẩm
                     ->where('product_id', $item['id'])
-                    ->value('stock');      
+                    ->value('stock');
                 $quantily += $item['quantily'];                                      // cộng với số lượng sản phẩm lấy được qua giỏ hàng
-    
-               
+
+
                 $orderDetail = OrderDetail::create([
                     'order_id' => $order->id,
                     'product_id' => $item['id'],
                     'quantity' => $item['quantily'],
                     'price' => $item['price_sell'],
                 ]);
-    
+
                 //Cập nhật lại số lượng trong kho
-                $newStock = $stok - $item['quantily'];      
-    
-               
+                $newStock = $stok - $item['quantily'];
+
                 if ($newStock < 0) {
                     throw new \Exception("Số lượng hàng trong kho đã hết" . $item['name']);
                 }
-    
+
                 DB::table('product_color_size')
                     ->where('product_id', $item['id'])
                     ->update(['stock' => $newStock]);
             }
-    
-          
+
             if ($request->payment_method == 'online' && $request->payment_method_option == 'momo') {
                 $momoResponse = $this->processPayment($order->id, $order->total_amount);
                 DB::commit();
                 return redirect()->away($momoResponse['payUrl']);
             }
-                     
+
             DB::commit();
-             
+
             session()->forget('cart');
-    
+
             return redirect()->route('checkoutstatus')->with('success', 'Đặt hàng thành công');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -102,18 +100,18 @@ class CheckoutController extends Controller
             return redirect()->route('checkoutstatus')->with('error', 'Đặt hàng thất bại. Vui lòng thử lại.');
         }
     }
-    
 
-    public function processPayment($orderId,$total_amount)
+
+    public function processPayment($orderId, $total_amount)
     {
-       
+
         $endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
         $partnerCode = 'MOMOBKUN20180529';
         $accessKey = 'klm05TvNBzhg7h7j';
         $secretKey = 'at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa';
         $orderInfo = "Thanh toán qua MoMo";
         $amount = floatval($total_amount);
-       
+
         $orderId = $orderId;
         $redirectUrl = route('checkout.success'); // URL trang thành công
         $ipnUrl = route('checkout.payment.notify'); // URL nhận thông báo callback từ MoMo
@@ -202,22 +200,22 @@ class CheckoutController extends Controller
         $rawHash = "accessKey=klm05TvNBzhg7h7j&amount=$amount&extraData=$extraData&ipnUrl=" . route('checkout.payment.notify') . "&orderId=$orderId&orderInfo=$orderInfo&partnerCode=$partnerCode&redirectUrl=" . route('checkout.success') . "&requestId=$requestId&requestType=payWithATM";
         $calculatedSignature = hash_hmac('sha256', $rawHash, $secretKey);
 
-  
+
 
         if ($resultCode == '0') {
-          
+
             $order = Order::where('id', $orderId)->first();
 
             if ($order) {
-                $order->status = 'completed';  
+                $order->status = 'completed';
 
                 $order->payment_method = 'online';
                 $order->total_amount = $amount;
                 $order->save();
                 session()->forget('cart');
-                return view('web.success', compact('order'))->with('success','Thanh toán Momo thành công');
+                return view('web.success', compact('order'))->with('success', 'Thanh toán Momo thành công');
             } else {
-               
+
                 return redirect()->route('checkout.status')->with('error', 'Không tìm thấy đơn hàng');
             }
         } else {
