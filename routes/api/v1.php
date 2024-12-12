@@ -23,4 +23,5 @@ Route::prefix('auth')->middleware('api')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
     Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:api');  // Middleware 'auth:api' sử dụng guard 'api'.
     Route::post('refresh', [AuthController::class, 'refresh']);
+    Route::get('profile', [AuthController::class, 'profile']);
 });
