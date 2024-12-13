@@ -6,6 +6,7 @@ use App\Helpers\TextSystemConst;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductColorSize;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -27,12 +28,19 @@ class PageController extends Controller
     public function productDetail($product)
     {
         $product = Product::where('id', $product)->first();
-
+        
+        $variants = ProductColorSize::with(['color', 'size'])
+        ->where('product_id', $product->id)
+        ->get()
+        ->groupBy('color_id'); 
+    
+    
+     //  dd($variants);
         $categories = Category::whereNull('parent_id')
             ->with('children')
             ->get();
 
-        return view('web.detail', compact('product', 'categories'));
+        return view('web.detail', compact('product', 'categories','variants'));
     }
     public function getProductbyCategory($slug)
     {

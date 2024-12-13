@@ -9,7 +9,7 @@ class ProductColorSize extends Model
 {
     use HasFactory;
 
-    protected $table = 'product_color_size';  // Đảm bảo tên bảng chính xác
+    protected $table = 'product_color_size';  
 
     // Các cột có thể được truy cập
     protected $fillable = ['product_id', 'color_id', 'size_id', 'stock', 'price_sell'];
