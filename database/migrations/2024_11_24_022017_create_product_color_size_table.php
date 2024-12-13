@@ -15,10 +15,12 @@ return new class extends Migration {
             $table->foreignId('color_id')->constrained()->onDelete('cascade');
             $table->foreignId('size_id')->constrained()->onDelete('cascade');
             $table->integer('stock')->default(0);
+            
             $table->primary(['product_id', 'color_id', 'size_id']);
             $table->timestamps();
         });
     }
+    
 
     /**
      * Reverse the migrations.

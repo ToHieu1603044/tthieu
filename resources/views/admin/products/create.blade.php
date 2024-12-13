@@ -1,139 +1,154 @@
 @extends('main')
+
 @section('content')
-    {{-- @dd('admin.categorybyparent') --}}
-    <section section class="content">
-        <header class="card-header bg-primary text-white">Sản phẩm / Thêm sản phẩm</header>
-        <div class="container-fluid">
-            <div class="row">
-            </div>
-
-            <form class="row" action="{{ route('products.store') }}" method="POST" id="form__js"
-                enctype="multipart/form-data">
-                @csrf
-                <div class="col-xl-12 col-lg-12 col-md-12">
-                    <div class="card card-default">
-                        <div class="card-header">
-
-                            <h3 class="card-title">Thông tin cơ bản</h3>
-                           
-                            @if (session()->has('success'))
-                                <div class="alert alert-success">{{ session('success') }}</div>
-                            @endif
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                            </div>
+    <div class="container">
+        <div aria-live="polite" aria-atomic="true" class="position-relative">
+            <div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer">
+                @foreach ($errors->all() as $error)
+                    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="toast-header">
+                            <strong class="me-auto text-danger">Lỗi</strong>
+                            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                         </div>
-                        <!-- /.card-header -->
-                        <div class="row">
-                            <div class="col-8">
-                                <div class="card-body row">
-                                    <x-admin-input-prepend label="Tên Sản Phẩm" width="auto">
-                                        <input id="name" type="text" name="name" class="form-control">
-                                    </x-admin-input-prepend>
-                                    <x-admin-input-prepend label="Giá Nhập" col="col-6" width="auto">
-                                        <input id="price_import" type="number" min="1" name="price_buy"
-                                            class="form-control">
-                                    </x-admin-input-prepend>
-                                    <x-admin-input-prepend label="Số lượng " col="col-6" width="auto">
-                                        <input id="stock" type="number" min="1" name="stock"
-                                            class="form-control">
-                                    </x-admin-input-prepend>
+                        <div class="toast-body">
+                            {{ $error }}
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
 
-                                    <x-admin-input-prepend label="Màu sắc" width="auto" col="col-6">
-                                        <select class="form-control" name="color" id="color">
-                                            @foreach ($colors as $key => $value)
-                                                <option value="{{ $key }}">{{ $value }}</option>
-                                            @endforeach
-                                        </select>
-                                    </x-admin-input-prepend>
+            <header class="card-header bg-primary text-white mb-5">Sản phẩm / Sửa sản phẩm</header>
+            <ul class="nav nav-tabs" id="productTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link active" id="product-details-tab" data-bs-toggle="tab" href="#product-details"
+                        role="tab" aria-controls="product-details" aria-selected="true">Chi Tiết Sản Phẩm</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="product-variants-tab" data-bs-toggle="tab" href="#product-variants"
+                        role="tab" aria-controls="product-variants" aria-selected="false">Biến Thể Sản Phẩm</a>
+                </li>
+            </ul>
+            <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="tab-content mt-3" id="productTabContent">
+                    <!-- Tab 1: Chi Tiết Sản Phẩm -->
+                    <div class="tab-pane fade show active" id="product-details" role="tabpanel"
+                        aria-labelledby="product-details-tab">
+                        <div class="mb-3">
+                            <label for="productName" class="form-label">Tên Sản Phẩm</label>
+                            <input type="text" class="form-control" id="productName" name="name"
+                                value="{{ old('name') }}">
+                        </div>
 
+                        <div class="mb-3">
+                            <label for="productName" class="form-label">Ảnh</label>
+                            <input type="file" class="form-control" id="img" name="img"
+                                value="{{ old('img') }}">
+                        </div>
 
-                                    <x-admin-input-prepend label="Giá Bán" col="col-6" width="auto">
-                                        <input id="price_sell" type="number" name="price_sell" class="form-control">
-                                    </x-admin-input-prepend>
-                                    <x-admin-input-prepend label="Kích thước" width="auto" col="col-6">
-                                        <select class="form-control" name="size" id="sizes">
-                                            @foreach ($sizes as $key => $value)
-                                                <option value="{{ $key }}">{{ $value }}</option>
-                                            @endforeach
-                                        </select>
-                                    </x-admin-input-prepend>
-                                    <x-admin-input-prepend label="Thời trang" width="auto" col="col-6">
-                                        <select class="form-control" name="parent_id" id="parent_id">
-                                            <option value="">...</option>
-                                            @foreach ($categories as $categoryParent)
-                                                <option value="{{ $categoryParent->id }}">{{ $categoryParent->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </x-admin-input-prepend>
-                                    <x-admin-input-prepend label="Danh Mục" width="auto">
-                                        <select class="form-control" name="category_id" id="category_id"
-                                            route="{{ route('admin.category_by_parent') }}">
-                                            @foreach ($categories as $category)
-                                                @foreach ($category->children as $item)
-                                                <option value="{{ $item->id }}">{{ $item->name }}
-                                                </option>
-                                                @endforeach
-                                            @endforeach
-                                        </select>
-                                    </x-admin-input-prepend>
-                                    <div class="mb-3 form-check">
-                                       <input type="radio"  class="form-check-label" name="status" value="1" > Còn hàng
-                                       <input type="radio"  class="form-check-label" name="status" value="0" > Hết hàng
-                                      </div>
-                                    <div class="card card-outline card-info col-12">
-                                        <div class="card-header">
-                                            <h3 class="card-title">
-                                                Mô Tả ngắn
-                                            </h3>
-                                        </div>
-                                        <!-- /.card-header -->
-                                        <div class="card-body">
-                                            <textarea id="summernote" name="description">
-                                           </textarea>
-                                        </div>
+                        <div class="mb-3">
+                            <label for="productPrice" class="form-label">Giá Gốc</label>
+                            <input type="number" class="form-control" id="productPrice" name="price_buy"
+                                value="{{ old('price_buy') }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="productPrice" class="form-label">Giá Bán</label>
+                            <input type="number" class="form-control" id="productPrice" name="price_sell"
+                                value="{{ old('price_sell') }}">
+                        </div>
+                        <div class="mb-3">
+                            <label for="parentCategory" class="form-label">Thời Trang</label>
+                            <select class="form-select" id="parentCategory" name="parent_id">
+                                <option value="">--------------</option>
+                                @foreach ($categories as $item)
+                                    <option value="{{ $item->id }}"
+                                        {{ old('parent_id') == $item->id ? 'selected' : '' }}>{{ $item->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Danh mục</label>
+                            <select class="form-select" id="category" name="category_id">
+                                <option value="">--------------</option>
+                                @foreach ($categories as $category)
+                                    @foreach ($category->children as $item)
+                                        <option value="{{ $item->id }}"
+                                            {{ old('category_id') == $item->id ? 'selected' : '' }}>{{ $item->name }}
+                                        </option>
+                                    @endforeach
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="productDescription" class="form-label">Mô Tả Ngắn</label>
+                            <textarea class="form-control" id="productDescription" name="description" rows="4">{{ old('description') }}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="productFullDescription" class="form-label">Mô Tả Chi Tiết</label>
+                            <textarea class="form-control" id="productFullDescription" name="descriptions" rows="4">{{ old('descriptions') }}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="productStatus" class="form-label">Trạng Thái</label>
+                            <select class="form-select" id="productStatus" name="status">
+                                <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Còn Hàng</option>
+                                <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Hết Hàng</option>
+                            </select>
+                        </div>
+                    </div>
+
+ 
+                    <div class="tab-pane fade" id="product-variants" role="tabpanel"
+                        aria-labelledby="product-variants-tab">
+                        <div class="mb-3">
+                            <label class="form-label">Chọn Màu Sắc</label>
+                            @foreach ($colors as $key => $value)
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="{{ $key }}"
+                                        name="color[]" id="color{{ $key }}"
+                                        {{ in_array($key, old('color', [])) ? 'checked' : '' }}>
+                                    <label class="form-check-label"
+                                        for="color{{ $key }}">{{ $value }}</label>
+                                    <div class="mt-2 ms-4">
+                                        <label for="colorQuantity" class="form-label">Số Lượng</label>
+                                        <input type="number" class="form-control" id=""
+                                            name="quantity[{{ $key }}]" min="0">
                                     </div>
-
-                                    <div class="card card-outline card-info col-12">
-                                        <div class="card-header">
-                                            <h3 class="card-title">
-                                                Mô Tả Sản dài
-                                            </h3>
-                                        </div>
-                                        <!-- /.card-header -->
-                                        <div class="card-body">
-                                            <textarea id="summernote" name="descriptions">
-                                           </textarea>
-                                        </div>
+                                    <div class="mt-2 ms-4">
+                                        <label class="form-label">Chọn Kích Thước</label>
+                                        @foreach ($sizes as $sizeKey => $sizeValue)
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                    value="{{ $sizeKey }}" name="size[{{ $key }}][]"
+                                                    id="size{{ $sizeKey }}{{ $key }}"
+                                                    {{ in_array($sizeKey, old('size.' . $key, [])) ? 'checked' : '' }}>
+                                                <label class="form-check-label"
+                                                    for="size{{ $sizeKey }}{{ $key }}">{{ $sizeValue }}</label>
+                                            </div>
+                                        @endforeach
                                     </div>
                                 </div>
-                            </div>
-                           
-                            
-                            <div class="col-4">
-                                <div class="card-body">
-                                    <div class="container">
-                                        <div class="preview">
-                                            <img id="img-preview" src="" />
-                                            <label for="file-input">Chọn Hình Ảnh</label>
-                                            <input accept="image/*" type="file" id="file-input" name="img" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 text-center" style="padding-bottom: 10px;">
-                                <button class="btn btn-success">THÊM MỚI</button>
-                                <a href="{{ route('products.index') }}" class="btn btn-danger">HỦY</a>
-                            </div>
+                            @endforeach
                         </div>
                     </div>
                 </div>
+
+                <div class="mt-4 text-end">
+                    <button type="submit" class="btn btn-primary">Lưu Sản Phẩm</button>
+                </div>
             </form>
-        </div>
-        </div>
+    </div>
     </section>
+    </div>
+    <script>
+        // Hiển thị tất cả các Toast khi có lỗi
+        document.addEventListener('DOMContentLoaded', function() {
+            let toastElements = document.querySelectorAll('.toast');
+            toastElements.forEach(function(toastElement) {
+                let toast = new bootstrap.Toast(toastElement);
+                toast.show();
+            });
+        });
+    </script>   
     @vite(['resources/js/user-create.js', 'resources/js/product.js', 'resources/css/product.css', 'resources/css/form-edit.css', 'resources/js/form.js'])
 @endsection

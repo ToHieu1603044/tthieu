@@ -7,7 +7,7 @@
 <div class="alert alert-success">{{ session('success') }}</div>
 @endif
 @if (session()->has('errors'))
-<div class="alert alert-danger">{{ session('success') }}</div>
+<div class="alert alert-danger">{{ session('error') }}</div>
 @endif
 <div class="container">
     <header class="card-header bg-primary text-white">Sản phẩm</header>

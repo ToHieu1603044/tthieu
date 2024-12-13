@@ -23,6 +23,19 @@ class CategoryController extends Controller
     {
         return view('admin.category.create');
     }
+    public function getChildren($id)
+    {
+        // Find the category by its ID and load its children
+        $category = Category::find($id);
+        
+        if ($category) {
+            // Return the children categories as JSON
+            return response()->json($category->children); // Assumes you have the 'children' relationship defined in the model
+        }
+
+        // Return an empty array if no category is found
+        return response()->json([]);
+    }
 
 
 }

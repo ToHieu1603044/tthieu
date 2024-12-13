@@ -23,10 +23,10 @@ class LoginController extends Controller
     protected function authenticated(Request $request, $user)
     {
         if ($user->id == 4||$user->id ==5) {
-           
+            session()->flash('toast', 'Welcome back, ' . $user->name . '!');
             return redirect()->route('admin'); 
         }
-
+        session()->flash('toast', 'Welcome back, ' . $user->name . '!');
         return redirect('/');
     }
 

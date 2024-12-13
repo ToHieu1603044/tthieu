@@ -62,7 +62,8 @@ Route::middleware(['auth','role:admin|subadmin'])->prefix('admin')->group(functi
     Route::resource('categories', CategoryController::class);
     Route::post('/order/{id}/update-note/', [OrderController::class, 'updateNote'])->name('order.updateNote');
     Route::resource('orders',OrderController::class);
-   
+    Route::get('/get-children-categories/{id}', [CategoryController::class, 'getChildren'])->name('get.children.categories');
+
 
 });
 

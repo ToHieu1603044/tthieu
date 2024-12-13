@@ -20,24 +20,23 @@ class Product extends Model
         'descriptions',
     ];
 
-    public function category(){
+    public function category()
+    {
         return $this->belongsTo(Category::class);
     }
 
+    // Mối quan hệ với bảng Colors thông qua bảng trung gian product_color_size
     public function colors()
     {
-        return $this->belongsToMany(Color::class, 'product_color_size','product_id')
-                    ->withPivot('size_id', 'stock'); 
+        return $this->belongsToMany(Color::class, 'product_color_size')
+                    ->withPivot('size_id', 'stock', 'price_sell');
     }
 
+    // Mối quan hệ với bảng Sizes thông qua bảng trung gian product_color_size
     public function sizes()
     {
-        return $this->belongsToMany(Size::class,'product_color_size','product_id')
-                    ->withPivot('color_id', 'stock'); 
-    }
-
-    public function orderDetails(){
-        return $this->hasMany(OrderDetail::class);
+        return $this->belongsToMany(Size::class, 'product_color_size')
+                    ->withPivot('color_id', 'stock', 'price_sell');
     }
 
 }

@@ -9,14 +9,13 @@ class Color extends Model
 {
     use HasFactory;
 
-    protected $fillable = [    
+    protected $fillable = [
         'name',
     ];
 
     public function products()
     {
-        return $this->belongsToMany(Product::class, 'product_color_size','product_id')
-                    ->withPivot('size_id', 'stock');
+        return $this->belongsToMany(Product::class, 'product_color_size')
+            ->withPivot('size_id', 'stock', 'price_sell');
     }
-
 }

@@ -13,9 +13,11 @@ class Size extends Model
         'name',
     ];
 
-    public function products()
-    {
-        return $this->belongsToMany(Product::class, 'product_color_size','product_id')
-                    ->withPivot('color_id', 'stock'); 
-    }
+   // Size.php
+   public function products()
+   {
+       return $this->belongsToMany(Product::class, 'product_color_size')
+                   ->withPivot('color_id', 'stock', 'price_sell');
+   }
+
 }

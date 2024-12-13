@@ -193,7 +193,22 @@
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <!-- Brand Logo -->
 
-
+            @if (session('toast'))
+                <!-- Toast Notification -->
+                <div class="toast-container position-fixed top-0 end-0 p-3">
+                    <div class="toast show bg-info text-white" role="alert" aria-live="assertive"
+                        aria-atomic="true" style="width: 300px;">
+                        <div class="toast-header">
+                            <strong class="me-auto">Welcome</strong>
+                            <button type="button" class="btn-close" data-bs-dismiss="toast"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="toast-body">
+                            {{ session('toast') }}
+                        </div>
+                    </div>
+                </div>
+            @endif
             <!-- Sidebar -->
             <div class="sidebar">
                 <!-- Sidebar user panel (optional) -->
@@ -396,6 +411,16 @@
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
     </script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        // Make sure Toast auto-closes after a few seconds
+        var toastEl = document.querySelector('.toast');
+        if (toastEl) {
+            var toast = new bootstrap.Toast(toastEl, {
+                delay: 5000
+            }); // 5 seconds delay
+            toast.show();
+        }
+    </script>
     @livewireScripts
 </body>
 

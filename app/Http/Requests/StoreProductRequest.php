@@ -28,7 +28,7 @@ class StoreProductRequest extends FormRequest
             'description'       =>'nullable',
             'price_buy'         =>'required',
             'price_sell'        =>'required',
-            'stock'             =>'required', 
+            'quantity'             =>'required', 
             'size'              =>'required',
             'color'              =>'required',
             'img'               =>'image|max:2048'
