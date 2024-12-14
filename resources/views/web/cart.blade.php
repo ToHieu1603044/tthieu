@@ -2,6 +2,7 @@
 @include('web.navbar')
 
 @section('content')
+
     <div class="container_fullwidth">
         <div class="container shopping-cart">
             <div class="row">
@@ -43,9 +44,9 @@
                             @endphp
                             @if (session('cart'))
                                 {{-- @dd(session('cart')) --}}
-                                @foreach (session('cart') as $item)
+                                @foreach (session('cart') as $key => $item)
                                     @php
-                                        $total += $item['price_sell'] * $item['quantily'];
+                                        $total += $item['price_sell'] * $item['quantity'];
                                     @endphp
                                     <tr>
                                         <td>
@@ -90,17 +91,17 @@
                                         </td>
                                         <td>
                                             Số lượng:
-                                            <input type="number" name="quantily" value="{{ $item['quantily'] }}" style="width: 75px;" min="1" max="{{$item['stock']}}"  >
+                                            <input type="number" name="quantity" value="{{ $item['quantity'] }}" style="width: 75px;" min="1" max="{{$item['stock']}}"  >
                                         </td>
                                         <td>
                                             <h5>
                                                 <strong class="red">
-                                                    {{ $item['price_sell'] * $item['quantily'] }}.vnd
+                                                    {{ $item['price_sell'] * $item['quantity'] }}.vnd
                                                 </strong>
                                             </h5>
                                         </td>
                                         <td>
-                                            <a class="pull-left btn btn-danger" href="{{route('removeCart',$item['id'])}}">Xóa</a>
+                                            <a class="pull-left btn btn-danger" href="{{route('removeCart',$key)}}">Xóa</a>
                                         </td>
                                     </tr>
                                 @endforeach

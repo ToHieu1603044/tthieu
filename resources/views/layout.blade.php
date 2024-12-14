@@ -107,8 +107,8 @@
                                                     alt=""></div>
                                             <div class="item-description">
                                                 <p class="name">{{ $item['name'] }}</p>
-                                                <p>Size:<span class="light-red">{{$item['size']}}</span><br>Quantity:<span
-                                                        class="light-red">{{ $item['quantily'] }}</span></p>
+                                                <p>Size:<span class="light-red">{{$item['sizes']}}</span><br>Quantity:<span
+                                                        class="light-red">{{ $item['quantity'] }}</span></p>
                                             </div>
                                             <div class="right">
                                                 <p class="price">{{ $item['price_sell'] }}</p>

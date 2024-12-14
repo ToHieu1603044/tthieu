@@ -19,12 +19,12 @@ class PageController extends Controller
     {
         $product = Product::all();
     
-        // Lấy tất cả các biến thể, nhóm theo sản phẩm và màu sắc
+       
         $variants = ProductColorSize::with(['color', 'size'])
             ->get()
-            ->groupBy('product_id') // Nhóm theo sản phẩm
+            ->groupBy('product_id') 
             ->map(function ($group) {
-                return $group->groupBy('color_id'); // Nhóm theo màu sắc trong từng sản phẩm
+                return $group->groupBy('color_id');
             });
           //  dd($variants);
            
@@ -69,45 +69,57 @@ class PageController extends Controller
     {
         return view('web.cart');
     }
-    public function storeCart(Product $product)
-    {       
-   
-        try {
-            $product = $product->load('category', 'colors', 'sizes');
-            $stock = DB::table('product_color_size')
-                ->where('product_id', $product->id)
-                ->where('color_id', $product->colors->first()->id)
-                ->where('size_id', $product->sizes->first()->id)
-                ->value('stock');
+    public function storeCart(Request $request, Product $product)
+{
+    try {
+        $colorId = $request->input('color');
+        $sizeId = $request->input('size');
 
-            $cart = session()->get('cart', []);
+        $colorName = DB::table('colors')->where('id', $colorId)->value('name');
+        $sizeName = DB::table('sizes')->where('id', $sizeId)->value('name');
 
-            if (isset($cart[$product->id])) {
+        // Lấy thông tin sản phẩm
+        $product = $product->load('category', 'colors', 'sizes');
 
-                $cart[$product->id]['quantily']++;
-            } else {
+        $stock = DB::table('product_color_size')
+            ->where('product_id', $product->id)
+            ->where('color_id', $colorId)
+            ->where('size_id', $sizeId)
+            ->value('stock');
 
-                $cart[$product->id] = [
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'quantily' => 1,
-                    'price_sell' => $product->price_sell,
-                    'image' => $product->img,
-                    'color' => $product->colors->first()->name,
-                    'size' => $product->sizes->first()->name,
-                    'stock' => $stock
-                ];
-            }
-            session()->put('cart', $cart);
+        if (!$stock || $stock <= 0) {
+            return redirect()->back()->with('error', 'Sản phẩm hiện không có sẵn trong kho.');
+        }
 
-            return redirect()->route('addtocart')->with('success', 'Thêm sản phẩm vào giỏ hàng thành công!');
-        } catch (\Throwable $th) {
-            return [
-                'line' => $th->getLine(),
-                'message' => $th->getMessage()
+        $cart = session()->get('cart', []);
+
+        $cartKey = "{$product->id}_{$colorId}_{$sizeId}";
+       
+        if (isset($cart[$cartKey])) {
+            $cart[$cartKey]['quantity']++;
+        } else {
+           
+            $cart[$cartKey] = [
+                'id' => $product->id,
+                'name' => $product->name,
+                'quantity' => 1,
+                'price_sell' => $product->price_sell,
+                'image' => $product->img,
+                'color' => $colorName,
+                'sizes' => $sizeName,
+                'stock' => $stock,
             ];
         }
+
+        session()->put('cart', $cart);
+
+        return redirect()->route('addtocart')->with('success', 'Thêm sản phẩm vào giỏ hàng thành công!');
+    } catch (\Throwable $th) {
+
+        return redirect()->back()->withErrors(['message' => $th->getMessage()]);
     }
+}
+
 
     public function removeCart($id)
     {
@@ -127,60 +139,7 @@ class PageController extends Controller
                 'message' => $th->getMessage()
             ];
         }
-    }
-
-
-    public function storeCarts(Request $request, $id)
-{
-    // Lấy sản phẩm theo ID
-    $product = Product::findOrFail($id);
-
-    // Load thông tin sản phẩm với các quan hệ (category, colors, sizes)
-    $product = $product->load('category', 'colors', 'sizes');
-
-    // Lấy số lượng tồn kho từ bảng trung gian 'product_color_size'
-    $stock = DB::table('product_color_size')
-        ->where('product_id', $product->id)
-        ->where('color_id', $product->colors->first()->id)
-        ->where('size_id', $product->sizes->first()->id)
-        ->value('stock');
-
-    // Kiểm tra giỏ hàng hiện tại
-    $cart = \Cart::getContent();
-
-    // Kiểm tra nếu sản phẩm đã có trong giỏ hàng
-    $cartItem = $cart->firstWhere('id', $product->id); // Thay thế 'where' bằng 'firstWhere'
-
-    if ($cartItem) {
-        // Nếu sản phẩm đã có trong giỏ hàng, tăng số lượng lên 1
-        if ($cartItem->quantity + 1 <= $stock) { // Kiểm tra số lượng còn trong kho
-            \Cart::update($cartItem->id, [
-                'quantity' => $cartItem->quantity + 1
-            ]);
-        } else {
-            return redirect()->route('addtocart')->with('error', 'Không đủ hàng trong kho!');
-        }
-    } else {
-        // Nếu sản phẩm chưa có trong giỏ hàng, thêm mới vào giỏ
-        \Cart::add([
-            'id' => $product->id,
-            'name' => $product->name,
-            'price' => $product->price_sell,
-            'quantity' => 1, // Mặc định số lượng là 1
-            'attributes' => [
-                'image' => $product->img,
-                'color' => $product->colors->first()->name,
-                'size' => $product->sizes->first()->name,
-                'stock' => $stock,
-            ]
-        ]);
-    }
-
-    // Quay lại trang giỏ hàng và thông báo thành công
-    return redirect()->route('addtocart')->with('success', 'Thêm sản phẩm vào giỏ hàng thành công!');
-}
-
-    
+    }    
     
 }
 

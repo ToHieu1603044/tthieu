@@ -38,7 +38,7 @@ Route::get('categoryslug/{slug}', [PageController::class, 'categorybyslug'])->na
 Route::get('get-pro-by-cate/{slug}', [PageController::class, 'getProductbyCategory'])->name('get-pro-by-cate');
 
 Route::get('addtocart', [PageController::class, 'addToCart'])->name('addtocart');
-Route::get('cart/{product}', [PageController::class, 'storeCart'])->name('cart');
+Route::post('cart/{product}', [PageController::class, 'storeCart'])->name('cart');
 Route::get('remove/{id}', [PageController::class, 'removeCart'])->name('removeCart');
 
 Route::get('orders-history',[ListOrderController::class,'index'])->name('user.order');

@@ -15,6 +15,8 @@
                     <li>
                         <div class="row">
                             @foreach ($product as $item)
+                               <form action="{{ route('cart',$item->id) }}" method="post" enctype="multipart/form-data" >
+                                @csrf
                                 <div class="col-md-3 col-sm-6">
                                     <div class="products">
                                         <div class="offer">- %20</div>
@@ -38,12 +40,12 @@
                                                         $color = $colorVariants->first()->color;
                                                     @endphp
                                                     <label>
-                                                        <input type="checkbox" name="color_{{ $item->id }}[]"
+                                                        <input type="checkbox" name="color"
                                                             class="color-checkbox"
                                                             data-product-id="{{ $item->id }}"
                                                             data-color-id="{{ $colorId }}"
                                                             value="{{ $colorId }}">
-                                                        <img src="{{ \Storage::url($color->image) }}"
+                                                        <img src=""
                                                             alt="{{ $color->name }}"
                                                             style="width: 24px; height: 24px; border: 1px solid #ddd; border-radius: 50%;">
                                                     </label>
@@ -54,22 +56,20 @@
                                         <!-- Chọn kích thước -->
                                         <div class="form-group">
                                             <label>Size:</label>
-                                            <div id="size_{{ $item->id }}" class="size-options">
+                                            <div id="size_{{ $item->id }}" class="size-options" >
                                                 <!-- Kích thước sẽ được thêm động -->
                                             </div>
                                         </div>
 
                                         <!-- Stock information -->
-                                        <div id="stock_{{ $item->id }}">
+                                        {{-- <div id="stock_{{ $item->id }}">
                                             <p>In Stock: <span id="stock_count_{{ $item->id }}">0</span></p>
-                                            <p>Price: <span id="price_{{ $item->id }}">0</span></p>
-                                        </div>
+                                           
+                                        </div> --}}
 
                                         <!-- Nút thêm vào giỏ -->
                                         <div class="button_group">
-                                            <a href="#"
-                                                onclick="addToCart('{{ route('cart', $item->id) }}', {{ $item->id }})"
-                                                class="button add-cart">Add to cart</a>
+                                            <button type="submit"  class="button add-cart" >Add Cart</button>
                                             <button class="button compare" type="button"><i
                                                     class="fa fa-exchange"></i></button>
                                             <button class="button wishlist" type="button"><i
@@ -77,6 +77,7 @@
                                         </div>
                                     </div>
                                 </div>
+                               </form>
                             @endforeach
                         </div>
                     </li>
@@ -112,8 +113,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 label.style.marginRight = '5px';
 
                 const input = document.createElement('input');
-                input.type = 'radio';  // Change to radio for single selection
-                input.name = `size_${productId}`;  // Same name group for radio buttons
+                input.type = 'radio';
+                input.name = `size`; 
                 input.value = variant.size.id;
 
                 label.appendChild(input);
