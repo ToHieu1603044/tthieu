@@ -18,13 +18,23 @@ class PageController extends Controller
     public function home()
     {
         $product = Product::all();
-
+    
+        // Lấy tất cả các biến thể, nhóm theo sản phẩm và màu sắc
+        $variants = ProductColorSize::with(['color', 'size'])
+            ->get()
+            ->groupBy('product_id') // Nhóm theo sản phẩm
+            ->map(function ($group) {
+                return $group->groupBy('color_id'); // Nhóm theo màu sắc trong từng sản phẩm
+            });
+          //  dd($variants);
+           
         $categories = Category::whereNull('parent_id')
             ->with('children')
             ->get();
-
-        return view('web.home', compact('product', 'categories'));
+    
+        return view('web.home', compact('product', 'categories', 'variants'));
     }
+    
     public function productDetail($product)
     {
         $product = Product::where('id', $product)->first();

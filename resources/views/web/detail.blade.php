@@ -104,7 +104,6 @@
                                     </select>
                                 </div>
 
-                                <!-- Hiển thị số lượng tồn kho -->
                                 <div class="form-group">
                                     <label for="stock">Stock:</label>
                                     <p id="stock"></p>
