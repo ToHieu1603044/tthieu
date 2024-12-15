@@ -55,6 +55,8 @@
                                 </a>
                             </div>
                         </div>
+                       <form action="{{ route('cart',$product->id) }}" method="post" enctype="multipart/form-data" >
+                        @csrf
                         <div class="products-description">
                             <h5 class="name">{{ $product->name }}</h5>
                             <p>
@@ -73,101 +75,113 @@
 
                             <hr class="border">
                             <div class="price">
-                                Price: <span class="new_price">{{ $product->price_sell }} <sup>$</sup></span>
-                                <span class="old_price">{{ $product->price_sell }} <sup>Vnd</sup></span>
+                                {{-- Price: <span  id="price" class="new_price"  >{{ $product->price_sell }}</span> --}}
+                                <input type="hidden"  name="price" value=" {{ $product->price_sell }}" id="price" class="price"  >
+                                {{-- <span id="price" class="old_price">{{ $product->price_sell }} <sup>Vnd</sup></span> --}}
+                            </div>
+                            <div class="form-group">
+                                <label for="price">Price:</label>
+                                <p id="price">N/A</p>
                             </div>
 
                             <hr class="border">
 
                             <div class="wided">
-                                <!-- Chọn Màu -->
+                  
                                 <div class="form-group">
                                     <label for="colorSelection">Color:</label>
-                                    <select class="form-select" id="colorSelection">
+                                    <select class="form-select" id="colorSelection" name="color" >
                                         <option value="">Select Color</option>
                                         @foreach ($variants as $colorId => $colorVariants)
                                             @php
                                                 $color = $colorVariants->first()->color;
                                             @endphp
-                                            <option value="{{ $color->id }}" data-color="{{ $color->name }}">
+                                            <option value="{{ $colorId }}" data-color="{{ $color->name }}">
                                                 {{ $color->name }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
-
-                                <!-- Chọn Kích Thước -->
+                                
                                 <div class="form-group">
                                     <label for="sizeSelection">Size:</label>
-                                    <select class="form-select" id="sizeSelection">
+                                    <select class="form-select" id="sizeSelection" name="size" >
                                         <option value="">Select Size</option>
                                     </select>
                                 </div>
-
+                                
                                 <div class="form-group">
                                     <label for="stock">Stock:</label>
-                                    <p id="stock"></p>
+                                    <p id="stock">N/A</p>
                                 </div>
-                            </div>
-
-                            <script>
-                                document.addEventListener('DOMContentLoaded', function() {
-                                    const colorSelection = document.getElementById('colorSelection');
-                                    const sizeSelection = document.getElementById('sizeSelection');
-                                    const stockDisplay = document.getElementById('stock');
-                                    
-                                    // Chuyển dữ liệu variants sang định dạng JavaScript
-                                    const variants = @json($variants);
-                                    
-                                    colorSelection.addEventListener('change', function() {
-                                        const colorId = colorSelection.value;
-                                        
-                                        // Reset kích thước và số lượng khi màu thay đổi
-                                        sizeSelection.innerHTML = '<option value="">Select Size</option>';
-                                        stockDisplay.textContent = '';
-                                        
-                                        if (colorId) {
-                                            // Tìm màu đã chọn và cập nhật kích thước
-                                            const selectedColor = variants[colorId];
-                                            
-                                            selectedColor.forEach(variant => {
-                                                const option = document.createElement('option');
-                                                option.value = variant.size.id;
-                                                option.textContent = variant.size.name;
-                                                sizeSelection.appendChild(option);
-                                            });
-                                        }
-                                    });
-
-                                    sizeSelection.addEventListener('change', function() {
-                                        const sizeId = sizeSelection.value;
-                                        
-                                        if (sizeId) {
-                                            // Tìm kích thước đã chọn và hiển thị số lượng tồn kho
+                    
+                                
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', function () {
+                                        const colorSelection = document.getElementById('colorSelection');
+                                        const sizeSelection = document.getElementById('sizeSelection');
+                                        const stockDisplay = document.getElementById('stock');
+                                        const priceDisplay = document.getElementById('price');
+                                
+                                        // Dữ liệu biến thể (variants) từ server
+                                        const variants = @json($variants);
+                                
+                                        // Khi người dùng chọn màu
+                                        colorSelection.addEventListener('change', function () {
                                             const colorId = colorSelection.value;
-                                            const selectedVariant = variants[colorId].find(variant => variant.size.id == sizeId);
-                                            
-                                            if (selectedVariant) {
-                                                stockDisplay.textContent = selectedVariant.stock + ' items in stock';
+                                
+                                            // Reset size và thông tin
+                                            sizeSelection.innerHTML = '<option value="">Select Size</option>';
+                                            stockDisplay.textContent = 'N/A';
+                                            priceDisplay.textContent = 'N/A';
+                                
+                                            if (colorId && variants[colorId]) {
+                                                const selectedColorVariants = variants[colorId];
+                                
+                                                // Thêm các tùy chọn kích thước vào dropdown Size
+                                                selectedColorVariants.forEach(variant => {
+                                                    const sizeOption = document.createElement('option');
+                                                    sizeOption.value = variant.size.id;
+                                                    sizeOption.textContent = variant.size.name;
+                                                    sizeSelection.appendChild(sizeOption);
+                                                });
                                             }
-                                        }
+                                        });
+                                
+                                        // Khi người dùng chọn kích thước
+                                        sizeSelection.addEventListener('change', function () {
+                                            const sizeId = sizeSelection.value;
+                                            const colorId = colorSelection.value;
+                                
+                                            if (colorId && sizeId && variants[colorId]) {
+                                                const selectedVariant = variants[colorId].find(variant => variant.size.id == sizeId);
+                                
+                                                if (selectedVariant) {
+                                                    // Hiển thị thông tin Stock và Price
+                                                    stockDisplay.textContent = `${selectedVariant.stock} items in stock`;
+                                                    priceDisplay.value = `${parseFloat(selectedVariant.price_sell).toLocaleString('vi-VN')} VND`;
+                                                } else {
+                                                    stockDisplay.textContent = 'N/A';
+                                                    priceDisplay.value = '{{ $product->price_sell }}';
+                                                }
+                                            }
+                                        });
                                     });
-                                });
-                            </script>
+                                </script>
+                                
 
                             <!-- Phần chọn số lượng -->
-                            <div class="qty">
+                            <div class="qty"   >
                                 Qty &nbsp;&nbsp;:
-                                <select class="form-select">
-                                    <option>1</option>
-                                    <option>2</option>
-                                    <option>3</option>
-                                    <option>4</option>
+                                <select class="form-select" name="quantity" >
+                                    <option value="1" >1</option>
+                                    <option value="2" >2</option>
+                                    <option value="3" >3</option>
                                 </select>
                             </div>
 
                             <div class="button_group">
-                                <button class="button">Add To Cart</button>
+                                <button class="button" type="submit" >Add To Cart</button>
                                 <button class="button compare">
                                     <i class="fa fa-exchange"></i>
                                 </button>
@@ -179,6 +193,7 @@
                                 </button>
                             </div>
                         </div>
+                    </form>
                     </div>
                     <div class="clearfix">
                     </div>

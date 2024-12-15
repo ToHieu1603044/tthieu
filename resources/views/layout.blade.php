@@ -64,7 +64,7 @@
                                 </div>
                                 <div class="col-md-3">
                                     <ul class="usermenu">
-                                        <!-- Kiểm tra nếu người dùng đã đăng nhập -->
+                               
                                         @auth
                                             <li><a href="" class="log">{{ Auth::user()->name }}</a></li>
                                             <form action="{{ route('logout') }}" method="post">
@@ -73,7 +73,6 @@
                                             </form>
                                         @endauth
 
-                                        <!-- Kiểm tra nếu người dùng chưa đăng nhập -->
                                         @guest
                                             <li><a href="{{ route('login') }}" class="log">Login</a></li>
                                             <li><a href="{{ route('register') }}" class="reg">Register</a></li>

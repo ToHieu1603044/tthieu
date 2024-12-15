@@ -98,32 +98,35 @@
                     </div>
 
  
-                    <div class="tab-pane fade" id="product-variants" role="tabpanel"
-                        aria-labelledby="product-variants-tab">
+                    <div class="tab-pane fade" id="product-variants" role="tabpanel" aria-labelledby="product-variants-tab">
                         <div class="mb-3">
                             <label class="form-label">Chọn Màu Sắc</label>
                             @foreach ($colors as $key => $value)
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="{{ $key }}"
-                                        name="color[]" id="color{{ $key }}"
+                                    <input class="form-check-input" type="checkbox" value="{{ $key }}" name="color[]" id="color{{ $key }}"
                                         {{ in_array($key, old('color', [])) ? 'checked' : '' }}>
-                                    <label class="form-check-label"
-                                        for="color{{ $key }}">{{ $value }}</label>
-                                    <div class="mt-2 ms-4">
-                                        <label for="colorQuantity" class="form-label">Số Lượng</label>
-                                        <input type="number" class="form-control" id=""
-                                            name="quantity[{{ $key }}]" min="0">
-                                    </div>
-                                    <div class="mt-2 ms-4">
-                                        <label class="form-label">Chọn Kích Thước</label>
+                                    <label class="form-check-label" for="color{{ $key }}">{{ $value }}</label>
+                                    
+                                    <!-- Chi tiết biến thể cho mỗi màu -->
+                                    <div class="mt-3 ms-4">
                                         @foreach ($sizes as $sizeKey => $sizeValue)
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox"
-                                                    value="{{ $sizeKey }}" name="size[{{ $key }}][]"
-                                                    id="size{{ $sizeKey }}{{ $key }}"
-                                                    {{ in_array($sizeKey, old('size.' . $key, [])) ? 'checked' : '' }}>
-                                                <label class="form-check-label"
-                                                    for="size{{ $sizeKey }}{{ $key }}">{{ $sizeValue }}</label>
+                                            <div class="mb-3 border p-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" value="{{ $sizeKey }}" name="size[{{ $key }}][]"
+                                                        id="size{{ $sizeKey }}{{ $key }}"
+                                                        {{ in_array($sizeKey, old('size.' . $key, [])) ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="size{{ $sizeKey }}{{ $key }}">{{ $sizeValue }}</label>
+                                                </div>
+                                                <div class="mt-2">
+                                                    <label for="quantity{{ $sizeKey }}{{ $key }}" class="form-label">Số Lượng</label>
+                                                    <input type="number" class="form-control" id="quantity{{ $sizeKey }}{{ $key }}"
+                                                        name="quantity[{{ $key }}][{{ $sizeKey }}]" min="0" value="{{ old('quantity.' . $key . '.' . $sizeKey, 0) }}">
+                                                </div>
+                                                <div class="mt-2">
+                                                    <label for="price{{ $sizeKey }}{{ $key }}" class="form-label">Giá</label>
+                                                    <input type="number" class="form-control" id="price{{ $sizeKey }}{{ $key }}"
+                                                        name="price[{{ $key }}][{{ $sizeKey }}]" min="0" value="{{ old('price.' . $key . '.' . $sizeKey, 0) }}">
+                                                </div>
                                             </div>
                                         @endforeach
                                     </div>
@@ -131,6 +134,7 @@
                             @endforeach
                         </div>
                     </div>
+                    
                 </div>
 
                 <div class="mt-4 text-end">
@@ -141,7 +145,7 @@
     </section>
     </div>
     <script>
-        // Hiển thị tất cả các Toast khi có lỗi
+      
         document.addEventListener('DOMContentLoaded', function() {
             let toastElements = document.querySelectorAll('.toast');
             toastElements.forEach(function(toastElement) {

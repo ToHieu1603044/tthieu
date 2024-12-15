@@ -76,7 +76,7 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request)
     {
-
+       // dd($request->all());
         $data = [
             'category_id' => $request->category_id,
             'name' => $request->name,
@@ -87,7 +87,6 @@ class ProductController extends Controller
             'descriptions' => $request->descriptions,
         ];
 
-        // Xử lý upload ảnh sản phẩm nếu có
         if ($request->hasFile('img')) {
             $data['img'] = Storage::put('products', $request->file('img'));
         }
@@ -95,18 +94,25 @@ class ProductController extends Controller
         $product = Product::create($data);
 
         foreach ($request->color as $colorId) {
-            foreach ($request->size[$colorId] as $sizeId) {
-                $quantity = $request->quantity[$colorId]; 
-
-                ProductColorSize::create([
-                    'product_id' => $product->id,
-                    'color_id' => $colorId,
-                    'size_id' => $sizeId,
-                    'stock' => $quantity,
-                    'price_sell' => $request->price_sell,
-                ]);
+            if (!empty($request->size[$colorId])) {
+                foreach ($request->size[$colorId] as $sizeId) {
+                    // Lấy số lượng cho màu và kích thước cụ thể
+                    $quantity = $request->quantity[$colorId][$sizeId] ?? 0;
+        
+                    // Lấy giá bán riêng (nếu có)
+                    $priceSell = $request->price[$colorId][$sizeId] ?? $request->price_sell;
+        
+                    ProductColorSize::create([
+                        'product_id' => $product->id,
+                        'color_id' => $colorId,
+                        'size_id' => $sizeId,
+                        'stock' => $quantity,
+                        'price_sell' => $priceSell,
+                    ]);
+                }
             }
         }
+        
         return redirect()->route('products.index')->with('success', 'Sản phẩm đã được tạo thành công.');
     }
 
