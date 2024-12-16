@@ -11,8 +11,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
-use Cart;
-
 class PageController extends Controller
 {
     public function home()
@@ -70,11 +68,18 @@ class PageController extends Controller
         return view('web.cart');
     }
     public function storeCart(Request $request, Product $product)
-    {   
-        dd($request->all());
+    {
+        //dd($product);
         try {
+
             $colorId = $request->input('color');
             $sizeId = $request->input('size');
+
+            $prices = DB::table('product_color_size')
+                ->where('product_id', $product->id)
+                ->where('color_id', $colorId)
+                ->where('size_id', $sizeId)
+                ->value('price_sell');
 
             $colorName = DB::table('colors')->where('id', $colorId)->value('name');
             $sizeName = DB::table('sizes')->where('id', $sizeId)->value('name');
@@ -102,8 +107,8 @@ class PageController extends Controller
                 $cart[$cartKey] = [
                     'id' => $product->id,
                     'name' => $product->name,
-                    'quantity' => 1,
-                    'price_sell' => $product->price_sell,
+                    'quantity' => isset($request->quantity) ? $request->quantity : 1,
+                    'price_sell' => $prices,
                     'image' => $product->img,
                     'color' => $colorName,
                     'sizes' => $sizeName,
@@ -119,7 +124,6 @@ class PageController extends Controller
             return redirect()->back()->withErrors(['message' => $th->getMessage()]);
         }
     }
-
 
     public function removeCart($id)
     {

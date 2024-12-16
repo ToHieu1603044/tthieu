@@ -29,7 +29,7 @@
                                             <div class="productname">
                                                 <a href="{{ route('product.detail', $item->id) }}">{{ $item['name'] }}</a>
                                             </div>
-                                            <h4 class="price">{{ $item['price_sell'] }}</h4>
+                                            <p id="price_{{ $item->id }}" class="price">{{ $item['price_sell'] }}</p>
 
 
                                             <div class="form-group">
@@ -50,21 +50,19 @@
                                                     @endforeach
                                                 </div>
                                             </div>
-
+                                            <input type="hidden" name="quantity" value="1">
 
                                             <div class="form-group">
                                                 <label>Size:</label>
                                                 <div id="size_{{ $item->id }}" class="size-options">
-                                                    <!-- Kích thước sẽ được thêm động -->
+
                                                 </div>
                                             </div>
 
-                                            <!-- Stock information -->
-                                            {{-- <div id="stock_{{ $item->id }}">
-                                            <p>In Stock: <span id="stock_count_{{ $item->id }}">0</span></p>
-                                           
-                                        </div> --}}
-
+                                            <div class="form-group">
+                                                <label>Stock:</label>
+                                                <p id="stock_count_{{ $item->id }}">N/A</p>
+                                            </div>
 
                                             <div class="button_group">
                                                 <button type="submit" class="button add-cart">Add Cart</button>
@@ -89,35 +87,12 @@
         document.addEventListener('DOMContentLoaded', function() {
             const variants = @json($variants);
 
+
             document.querySelectorAll('.color-checkbox').forEach(checkbox => {
                 checkbox.addEventListener('change', function() {
                     const productId = this.getAttribute('data-product-id');
                     const colorId = this.getAttribute('data-color-id');
 
-                    document.querySelectorAll(`.size-options`).forEach(sizeContainer => {
-                        sizeContainer.innerHTML = '';
-                    });
-
-
-                    const sizeContainer = document.querySelector(`#size_${productId}`);
-                    const colorVariants = variants[productId][colorId];
-
-
-                    sizeContainer.innerHTML = '';
-                    colorVariants.forEach(variant => {
-                        const label = document.createElement('label');
-                        label.style.marginRight = '5px';
-
-                        const input = document.createElement('input');
-                        input.type = 'radio';
-                        input.name = `size`;
-                        input.value = variant.size.id;
-
-                        label.appendChild(input);
-                        label.appendChild(document.createTextNode(variant.size.name));
-
-                        sizeContainer.appendChild(label);
-                    });
 
                     document.querySelectorAll('.color-checkbox').forEach(otherCheckbox => {
                         if (otherCheckbox !== this) {
@@ -125,27 +100,62 @@
                         }
                     });
 
+                    const sizeContainer = document.querySelector(`#size_${productId}`);
+                    sizeContainer.innerHTML = '';
 
-                    updateStockPrice(productId, colorId);
+                    const colorVariants = variants[productId][colorId] || [];
+                    if (colorVariants.length > 0) {
+                        colorVariants.forEach(variant => {
+                            const label = document.createElement('label');
+                            label.style.marginRight = '5px';
+
+                            const input = document.createElement('input');
+                            input.type = 'radio';
+                            input.name = `size`;
+                            input.value = variant.size.id;
+                            input.setAttribute('data-stock', variant.stock);
+                            input.setAttribute('data-price', variant.price_sell);
+                            input.setAttribute('data-product-id', productId);
+
+                            label.appendChild(input);
+                            label.appendChild(document.createTextNode(variant.size.name));
+
+                            sizeContainer.appendChild(label);
+                        });
+                    }
+
+                    updateStockPrice(productId, null, null);
                 });
             });
 
-
-            document.querySelectorAll('.size-options input').forEach(input => {
-                input.addEventListener('change', function() {
-                    const productId = this.name.split('_')[1];
-                    const sizeId = this.value;
-                    const colorId = document.querySelector(`#color_${productId} input:checked`)
-                        ?.value;
+            document.addEventListener('change', function(event) {
+                if (event.target.name === 'size') {
+                    const productId = event.target.getAttribute('data-product-id');
+                    const sizeId = event.target.value;
+                    const colorId = document.querySelector(`#color_${productId} input:checked`)?.value;
 
                     if (colorId && sizeId) {
-
                         updateStockPrice(productId, colorId, sizeId);
                     }
-                });
+                }
             });
 
+            function updateStockPrice(productId, colorId, sizeId) {
+                const stockElement = document.querySelector(`#stock_count_${productId}`);
+                const priceElement = document.querySelector(`#price_${productId}`);
 
+                if (colorId && sizeId) {
+                    const sizeInput = document.querySelector(`input[name="size"][value="${sizeId}"]`);
+                    const stock = sizeInput?.getAttribute('data-stock') || '0';
+                    const price = sizeInput?.getAttribute('data-price') || '0.00';
+
+                    stockElement.textContent = stock + ' items in stock';
+                    priceElement.textContent = price;
+                } else {
+                    stockElement.textContent = 'N/A';
+                    priceElement.textContent = '{{ $item->price_sell }}';
+                }
+            }
         });
     </script>
 @endsection

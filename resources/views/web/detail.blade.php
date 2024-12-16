@@ -76,7 +76,7 @@
                             <hr class="border">
                             <div class="price">
                                 {{-- Price: <span  id="price" class="new_price"  >{{ $product->price_sell }}</span> --}}
-                                <input type="hidden"  name="price" value=" {{ $product->price_sell }}" id="price" class="price"  >
+                                <input type="text"  name="price" value=" {{ $product->price_sell }}" id="price" class="price"  >
                                 {{-- <span id="price" class="old_price">{{ $product->price_sell }} <sup>Vnd</sup></span> --}}
                             </div>
                             <div class="form-group">
@@ -159,7 +159,7 @@
                                                 if (selectedVariant) {
                                                     // Hiển thị thông tin Stock và Price
                                                     stockDisplay.textContent = `${selectedVariant.stock} items in stock`;
-                                                    priceDisplay.value = `${parseFloat(selectedVariant.price_sell).toLocaleString('vi-VN')} VND`;
+                                                    priceDisplay.value = selectedVariant.price_sell;
                                                 } else {
                                                     stockDisplay.textContent = 'N/A';
                                                     priceDisplay.value = '{{ $product->price_sell }}';

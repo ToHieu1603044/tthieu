@@ -2,13 +2,12 @@
 @include('web.navbar')
 
 @section('content')
-
     <div class="container_fullwidth">
         <div class="container shopping-cart">
             <div class="row">
                 <div class="col-md-12">
                     <h3 class="title">
-                       Giỏ hàng
+                        Giỏ hàng
                     </h3>
                     <div class="clearfix">
                     </div>
@@ -91,7 +90,8 @@
                                         </td>
                                         <td>
                                             Số lượng:
-                                            <input type="number" name="quantity" value="{{ $item['quantity'] }}" style="width: 75px;" min="1" max="{{$item['stock']}}"  >
+                                            <input type="number" name="quantity" value="{{ $item['quantity'] }}"
+                                                style="width: 75px;" min="1" max="{{ $item['stock'] }}">
                                         </td>
                                         <td>
                                             <h5>
@@ -101,7 +101,8 @@
                                             </h5>
                                         </td>
                                         <td>
-                                            <a class="pull-left btn btn-danger" href="{{route('removeCart',$key)}}">Xóa</a>
+                                            <a class="pull-left btn btn-danger"
+                                                href="{{ route('removeCart', $key) }}">Xóa</a>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -117,7 +118,7 @@
                                         <a href="/">Tiếp tục mua hàng</a>
                                     </button>
                                     <button class=" pull-right">
-                                       Cập nhật giỏ hàng
+                                        Cập nhật giỏ hàng
                                     </button>
                                 </td>
                             </tr>
@@ -126,11 +127,11 @@
                     <div class="clearfix">
                     </div>
                     <div class="row">
-                       
+
                         <div class="col-md-4 col-sm-6">
                             <div class="shippingbox">
                                 <h5>
-                                   Mã giản giá
+                                    Mã giản giá
                                 </h5>
                                 <form>
                                     <label>
@@ -163,7 +164,7 @@
                                         {{ $total }}.VND
                                     </span>
                                 </div>
-                                <a href="{{ route('checkout') }}" class="btn btn-success" >Thanh toán</a>
+                                <a href="{{ route('checkout') }}" class="btn btn-success">Thanh toán</a>
                             </div>
                         </div>
                     </div>
