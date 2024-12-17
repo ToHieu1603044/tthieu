@@ -76,7 +76,7 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request)
     {
-       // dd($request->all());
+        // dd($request->all());
         $data = [
             'category_id' => $request->category_id,
             'name' => $request->name,
@@ -93,15 +93,13 @@ class ProductController extends Controller
 
         $product = Product::create($data);
 
-        foreach ($request->color as $colorId) {
-            if (!empty($request->size[$colorId])) {
-                foreach ($request->size[$colorId] as $sizeId) {
-                    // Lấy số lượng cho màu và kích thước cụ thể
-                    $quantity = $request->quantity[$colorId][$sizeId] ?? 0;
-        
-                    // Lấy giá bán riêng (nếu có)
-                    $priceSell = $request->price[$colorId][$sizeId] ?? $request->price_sell;
-        
+        foreach ($request->size as $sizeId) {
+            if (!empty($request->color[$sizeId])) {
+                foreach ($request->color[$sizeId] as $colorId) {
+
+                    $quantity = $request->quantity[$sizeId][$colorId] ?? 0;
+                    $priceSell = $request->price[$sizeId][$colorId] ?? $request->price_sell;
+
                     ProductColorSize::create([
                         'product_id' => $product->id,
                         'color_id' => $colorId,
@@ -112,13 +110,14 @@ class ProductController extends Controller
                 }
             }
         }
-        
+
+
         return redirect()->route('products.index')->with('success', 'Sản phẩm đã được tạo thành công.');
     }
 
     public function show(Product $product)
     {
-       
+
     }
 
     public function edit(Product $product)

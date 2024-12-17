@@ -22,7 +22,7 @@ class PageController extends Controller
             ->get()
             ->groupBy('product_id')
             ->map(function ($group) {
-                return $group->groupBy('color_id');
+                return $group->groupBy('size_id');
             });
         //  dd($variants);
 
@@ -40,7 +40,7 @@ class PageController extends Controller
         $variants = ProductColorSize::with(['color', 'size'])
             ->where('product_id', $product->id)
             ->get()
-            ->groupBy('color_id');
+            ->groupBy('size_id');
 
 
         //  dd($variants);
@@ -69,7 +69,7 @@ class PageController extends Controller
     }
     public function storeCart(Request $request, Product $product)
     {
-        //dd($product);
+        //  dd($request->all());
         try {
 
             $colorId = $request->input('color');

@@ -56,27 +56,26 @@
                                                 <div class="productname">
                                                     {{ $item['name'] }}
                                                 </div>
-                                                <p>
-                                                    <img alt="" src="images/star.png">
-                                                    <a class="review_num" href="#">
-                                                        02 Review(s)
-                                                    </a>
-                                                </p>
+                                                <span>
+                                                        Size: {{ $item['sizes'] }}
+                                                </span>
+                                                <br>
+                                                <br>
                                                 <div class="color-choser">
                                                     <span class="text">
-                                                        Product Color :
+                                                        Color : {{ $item['color'] }}
                                                     </span>
                                                     <ul>
 
-                                                        <li>
-                                                            <a class="pink-bg" href="#">
+                                                        {{-- <li>
+                                                            <a class="pink" href="#">
                                                                 {{ $item['color'] }}
                                                             </a>
-                                                        </li>
+                                                        </li> --}}
                                                     </ul>
                                                 </div>
                                                 <p>
-                                                    Product Code :
+                                                    Code :
                                                     <strong class="pcode">
                                                         {{ $item['name'] }}TTH18964
                                                     </strong>

@@ -100,32 +100,34 @@
  
                     <div class="tab-pane fade" id="product-variants" role="tabpanel" aria-labelledby="product-variants-tab">
                         <div class="mb-3">
-                            <label class="form-label">Chọn Màu Sắc</label>
-                            @foreach ($colors as $key => $value)
+                            <label class="form-label">Chọn Kích Thước</label>
+                            @foreach ($sizes as $sizeKey => $sizeValue)
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="{{ $key }}" name="color[]" id="color{{ $key }}"
-                                        {{ in_array($key, old('color', [])) ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="color{{ $key }}">{{ $value }}</label>
+                                    <!-- Checkbox cho từng size -->
+                                    <input class="form-check-input" type="checkbox" value="{{ $sizeKey }}" name="size[]" id="size{{ $sizeKey }}"
+                                        {{ in_array($sizeKey, old('size', [])) ? 'checked' : '' }}>
+                                    <label class="form-check-label fw-bold" for="size{{ $sizeKey }}">{{ $sizeValue }}</label>
                                     
-                                    <!-- Chi tiết biến thể cho mỗi màu -->
+                                    <!-- Chọn màu sắc cho từng kích thước -->
                                     <div class="mt-3 ms-4">
-                                        @foreach ($sizes as $sizeKey => $sizeValue)
+                                        @foreach ($colors as $key => $value)
                                             <div class="mb-3 border p-3">
                                                 <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" value="{{ $sizeKey }}" name="size[{{ $key }}][]"
-                                                        id="size{{ $sizeKey }}{{ $key }}"
-                                                        {{ in_array($sizeKey, old('size.' . $key, [])) ? 'checked' : '' }}>
-                                                    <label class="form-check-label" for="size{{ $sizeKey }}{{ $key }}">{{ $sizeValue }}</label>
+                                                    <input class="form-check-input" type="checkbox" value="{{ $key }}" name="color[{{ $sizeKey }}][]"
+                                                        id="color{{ $key }}{{ $sizeKey }}"
+                                                        {{ in_array($key, old('color.' . $sizeKey, [])) ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="color{{ $key }}{{ $sizeKey }}">{{ $value }}</label>
                                                 </div>
+                                                <!-- Số lượng và giá cho từng size và màu -->
                                                 <div class="mt-2">
                                                     <label for="quantity{{ $sizeKey }}{{ $key }}" class="form-label">Số Lượng</label>
                                                     <input type="number" class="form-control" id="quantity{{ $sizeKey }}{{ $key }}"
-                                                        name="quantity[{{ $key }}][{{ $sizeKey }}]" min="0" value="{{ old('quantity.' . $key . '.' . $sizeKey, 0) }}">
+                                                        name="quantity[{{ $sizeKey }}][{{ $key }}]" min="0" value="{{ old('quantity.' . $sizeKey . '.' . $key, 0) }}">
                                                 </div>
                                                 <div class="mt-2">
                                                     <label for="price{{ $sizeKey }}{{ $key }}" class="form-label">Giá</label>
                                                     <input type="number" class="form-control" id="price{{ $sizeKey }}{{ $key }}"
-                                                        name="price[{{ $key }}][{{ $sizeKey }}]" min="0" value="{{ old('price.' . $key . '.' . $sizeKey, 0) }}">
+                                                        name="price[{{ $sizeKey }}][{{ $key }}]" min="0" value="{{ old('price.' . $sizeKey . '.' . $key, 0) }}">
                                                 </div>
                                             </div>
                                         @endforeach
@@ -134,6 +136,7 @@
                             @endforeach
                         </div>
                     </div>
+                    
                     
                 </div>
 

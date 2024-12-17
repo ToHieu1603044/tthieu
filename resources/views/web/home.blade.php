@@ -33,37 +33,37 @@
 
 
                                             <div class="form-group">
-                                                <label>Color:</label>
-                                                <div id="color_{{ $item->id }}" class="color-options">
-                                                    @foreach ($variants[$item->id] as $colorId => $colorVariants)
+                                                <label>Size:</label>
+                                                <div id="size_{{ $item->id }}" class="size-options">
+                                                    @foreach ($variants[$item->id] as $sizeId => $sizeVariants)
                                                         @php
-                                                            $color = $colorVariants->first()->color;
+                                                            $size = $sizeVariants->first()->size;
                                                         @endphp
                                                         <label>
-                                                            <input type="checkbox" name="color" class="color-checkbox"
+                                                            <input type="radio" name="size" class="size-radio"
                                                                 data-product-id="{{ $item->id }}"
-                                                                data-color-id="{{ $colorId }}"
-                                                                value="{{ $colorId }}">
-                                                            <img src="" alt="{{ $color->name }}"
-                                                                style="width: 24px; height: 24px; border: 1px solid #ddd; border-radius: 50%;">
+                                                                data-size-id="{{ $sizeId }}"
+                                                                value="{{ $sizeId }}">
+                                                            {{ $size->name }}
                                                         </label>
                                                     @endforeach
                                                 </div>
                                             </div>
-                                            <input type="hidden" name="quantity" value="1">
-
+                                            
                                             <div class="form-group">
-                                                <label>Size:</label>
-                                                <div id="size_{{ $item->id }}" class="size-options">
-
+                                                <label>Color:</label>
+                                                <div id="color_{{ $item->id }}"  class="color-options">
+                                                  
                                                 </div>
                                             </div>
-
+                                            
                                             <div class="form-group">
                                                 <label>Stock:</label>
                                                 <p id="stock_count_{{ $item->id }}">N/A</p>
                                             </div>
-
+                                            
+                                           
+                                            
                                             <div class="button_group">
                                                 <button type="submit" class="button add-cart">Add Cart</button>
                                                 <button class="button compare" type="button"><i
@@ -72,8 +72,11 @@
                                                         class="fa fa-heart-o"></i></button>
                                             </div>
                                         </div>
+                                       
                                     </div>
+                                    
                                 </form>
+                                
                             @endforeach
                         </div>
                     </li>
@@ -83,79 +86,97 @@
     </div>
 
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const variants = @json($variants);
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const variants = @json($variants);
 
+    document.querySelectorAll('.size-radio').forEach(radio => {
+        radio.addEventListener('change', function () {
+            const productId = this.getAttribute('data-product-id');
+            const sizeId = this.getAttribute('data-size-id');
 
-            document.querySelectorAll('.color-checkbox').forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    const productId = this.getAttribute('data-product-id');
-                    const colorId = this.getAttribute('data-color-id');
+            
+            const colorContainer = document.querySelector(`#color_${productId}`);
+            colorContainer.innerHTML = '';
 
+            clearOtherSelections(productId);
 
-                    document.querySelectorAll('.color-checkbox').forEach(otherCheckbox => {
-                        if (otherCheckbox !== this) {
-                            otherCheckbox.checked = false;
-                        }
-                    });
+            const sizeVariants = variants[productId][sizeId] || [];
+            sizeVariants.forEach(variant => {
+                const color = variant.color;
 
-                    const sizeContainer = document.querySelector(`#size_${productId}`);
-                    sizeContainer.innerHTML = '';
+                const label = document.createElement('label');
+                label.style.marginRight = '5px';
 
-                    const colorVariants = variants[productId][colorId] || [];
-                    if (colorVariants.length > 0) {
-                        colorVariants.forEach(variant => {
-                            const label = document.createElement('label');
-                            label.style.marginRight = '5px';
+                const input = document.createElement('input');
+                input.type = 'radio';
+                input.name = `color`;
+                input.value = color.id;
+                input.setAttribute('data-stock', variant.stock);
+                input.setAttribute('data-price', variant.price_sell);
+                input.setAttribute('data-product-id', productId);
 
-                            const input = document.createElement('input');
-                            input.type = 'radio';
-                            input.name = `size`;
-                            input.value = variant.size.id;
-                            input.setAttribute('data-stock', variant.stock);
-                            input.setAttribute('data-price', variant.price_sell);
-                            input.setAttribute('data-product-id', productId);
-
-                            label.appendChild(input);
-                            label.appendChild(document.createTextNode(variant.size.name));
-
-                            sizeContainer.appendChild(label);
-                        });
-                    }
-
-                    updateStockPrice(productId, null, null);
-                });
+                label.appendChild(input);
+                label.appendChild(document.createTextNode(color.name));
+                colorContainer.appendChild(label);
             });
 
-            document.addEventListener('change', function(event) {
-                if (event.target.name === 'size') {
-                    const productId = event.target.getAttribute('data-product-id');
-                    const sizeId = event.target.value;
-                    const colorId = document.querySelector(`#color_${productId} input:checked`)?.value;
-
-                    if (colorId && sizeId) {
-                        updateStockPrice(productId, colorId, sizeId);
-                    }
-                }
-            });
-
-            function updateStockPrice(productId, colorId, sizeId) {
-                const stockElement = document.querySelector(`#stock_count_${productId}`);
-                const priceElement = document.querySelector(`#price_${productId}`);
-
-                if (colorId && sizeId) {
-                    const sizeInput = document.querySelector(`input[name="size"][value="${sizeId}"]`);
-                    const stock = sizeInput?.getAttribute('data-stock') || '0';
-                    const price = sizeInput?.getAttribute('data-price') || '0.00';
-
-                    stockElement.textContent = stock + ' items in stock';
-                    priceElement.textContent = price;
-                } else {
-                    stockElement.textContent = 'N/A';
-                    priceElement.textContent = '{{ $item->price_sell }}';
-                }
-            }
+            updateStockPrice(productId, null);
         });
-    </script>
+    });
+
+
+document.addEventListener('change', function (event) {
+    if (event.target.name === 'color') { 
+        const productId = event.target.getAttribute('data-product-id');
+
+        clearOtherSelections(productId);
+
+        updateStockPrice(productId, event.target);
+    }
+});
+
+
+
+    function updateStockPrice(productId, colorInput) {
+        const stockElement = document.querySelector(`#stock_count_${productId}`);
+        const priceElement = document.querySelector(`#price_${productId}`);
+
+        if (colorInput) {
+            const stock = colorInput.getAttribute('data-stock') || '0';
+            const price = colorInput.getAttribute('data-price') || '0.00';
+
+            stockElement.textContent = `${stock}`;
+            priceElement.textContent = price;
+        } else {
+            stockElement.textContent = 'N/A';
+            priceElement.textContent = '{{ $item->price_sell }}';
+        }
+    }
+
+
+    function clearOtherSelections(currentProductId) {
+  
+    document.querySelectorAll('.size-radio, [name="color"]').forEach(input => {
+        if (input.getAttribute('data-product-id') !== currentProductId) {
+            input.checked = false;
+        }
+    });
+
+    document.querySelectorAll(`[id^="stock_count_"], [id^="price_"]`).forEach(element => {
+        const elementProductId = element.id.split('_')[2];
+        if (elementProductId !== currentProductId) {
+            if (element.id.startsWith('stock_count')) {
+                element.textContent = 'N/A';
+            } else if (element.id.startsWith('price')) {
+                element.textContent = '{{ $item->price_sell }}';
+            }
+        }
+    });
+}
+
+});
+
+  </script>
+   
 @endsection
