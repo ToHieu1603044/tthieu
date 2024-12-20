@@ -31,7 +31,7 @@ class ProductController extends Controller
     }
     public function index()
     {
-        $data = Product::with(['category'])->paginate(5);
+        $data = Product::with(['category'])->latest()->paginate(5);
         // dd($data);
         $tableCrud = [
             'headers' => [
@@ -76,7 +76,7 @@ class ProductController extends Controller
 
     public function store(StoreProductRequest $request)
     {
-        // dd($request->all());
+        //dd($request->all());
         $data = [
             'category_id' => $request->category_id,
             'name' => $request->name,
@@ -110,8 +110,6 @@ class ProductController extends Controller
                 }
             }
         }
-
-
         return redirect()->route('products.index')->with('success', 'Sản phẩm đã được tạo thành công.');
     }
 

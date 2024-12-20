@@ -147,8 +147,6 @@
                 </ul>
 
                 <hr>
-
-
                 <a href="{{ route('orders.index') }}" class="btn btn-warning" data-abc="true">
                     <i class="fa fa-chevron-left"></i> Trở lại
                 </a>
@@ -160,6 +158,7 @@
     </div>
 
     <script>
+    
         document.addEventListener('DOMContentLoaded', function() {
             const steps = document.querySelectorAll('.step');
 
